@@ -1,0 +1,18 @@
+{
+  "name": "pi-dashboard-server",
+  "version": "1.0.0",
+  "description": "Backend server for Pi Dashboard",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "systeminformation": "^5.21.20",
+    "dockerode": "^4.0.2",
+    "node-fetch": "^3.3.2",
+    "dotenv": "^16.3.1"
+  }
+}
