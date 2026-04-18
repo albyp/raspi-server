@@ -1,0 +1,92 @@
+/* Dark theme for server dashboard */
+:root {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2a2a2a;
+  --bg-tertiary: #3a3a3a;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #888888;
+  --accent: #00d4aa;
+  --accent-hover: #00b894;
+  --success: #00d4aa;
+  --warning: #ffa726;
+  --error: #f44336;
+  --border: #444444;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'JetBrains Mono', 'IBM Plex Sans', monospace;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.last-updated {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.widget {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.widget h2 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+}
+
+.error {
+  color: var(--error);
+}
+
+.last-updated.stale {
+  color: var(--warning);
+}
+
+.dashboard.stale .widget {
+  opacity: 0.6;
+  border-color: var(--warning);
+}
