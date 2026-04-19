@@ -26,9 +26,9 @@ export async function getSystemInfo() {
     return {
       cpu: Math.round(cpuLoad.currentLoad * 100) / 100,
       ram: {
-        used: Math.round(mem.used / 1024 / 1024 / 1024 * 100) / 100, // GB
+        used: Math.round(mem.active / 1024 / 1024 / 1024 * 100) / 100, // GB — active only, matches htop
         total: Math.round(mem.total / 1024 / 1024 / 1024 * 100) / 100,
-        percent: Math.round(mem.used / mem.total * 100)
+        percent: Math.round(mem.active / mem.total * 100)
       },
       disk: {
         used: Math.round(disk[0].used / 1024 / 1024 / 1024 * 100) / 100, // GB
