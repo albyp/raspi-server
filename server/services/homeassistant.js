@@ -1,10 +1,10 @@
 import fetch from 'node-fetch';
 
-const HA_BASE_URL = process.env.HA_BASE_URL || 'http://localhost:8123';
-const HA_TOKEN = process.env.HA_TOKEN;
-const HA_ENTITY_IDS = process.env.HA_ENTITY_IDS ? process.env.HA_ENTITY_IDS.split(',') : [];
-
 export async function getHomeAssistantInfo() {
+  const HA_BASE_URL = process.env.HA_BASE_URL || 'http://localhost:8123';
+  const HA_TOKEN = process.env.HA_TOKEN;
+  const HA_ENTITY_IDS = process.env.HA_ENTITY_IDS ? process.env.HA_ENTITY_IDS.split(',') : [];
+
   try {
     if (!HA_TOKEN) {
       return { reachable: false, error: 'No HA token configured' };
@@ -39,6 +39,8 @@ export async function getHomeAssistantInfo() {
 }
 
 export async function callHAService(domain, service, entity_id) {
+  const HA_BASE_URL = process.env.HA_BASE_URL || 'http://localhost:8123';
+  const HA_TOKEN = process.env.HA_TOKEN;
   if (!HA_TOKEN) throw new Error('No HA token configured');
 
   const response = await fetch(`${HA_BASE_URL}/api/services/${domain}/${service}`, {
