@@ -15,7 +15,7 @@ export default function QuickLinks() {
         {LINKS.map((link, index) => {
           const Icon = typeof link.icon === 'string' ? null : link.icon;
           return (
-
+            <a
               key={index}
               href={link.url}
               target="_blank"
