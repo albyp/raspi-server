@@ -1,6 +1,7 @@
 import React from 'react';
 import { OsIcon } from './ServiceIcon';
 import { formatBytes, timeAgo } from '../format';
+import { usePrefs } from '../prefs';
 
 const CONNECTION_LABEL = {
   self: 'this device',
@@ -16,15 +17,16 @@ function connectionColor(node) {
   return 'green';
 }
 
-function Detail({ node }) {
+function Detail({ node, redact }) {
   if (node.connection === 'self') return <span className="muted">this Pi</span>;
   if (!node.online) return <span className="muted">last seen {timeAgo(node.lastSeen)}</span>;
-  if (node.connection === 'direct') return <span className="muted mono">{node.curAddr}</span>;
+  if (node.connection === 'direct') return <span className="muted mono">{redact(node.curAddr)}</span>;
   if (node.connection === 'relay') return <span className="muted">via DERP {node.relay}</span>;
   return <span className="muted">online</span>;
 }
 
 export default function TailscaleStatus({ data }) {
+  const { redact } = usePrefs();
   if (!data) return <section className="widget">Loading Tailscale...</section>;
 
   if (!data.reachable) {
@@ -73,11 +75,11 @@ export default function TailscaleStatus({ data }) {
                     <span className="ts-name">{node.dnsName}</span>
                   </div>
                 </td>
-                <td className="mono">{node.ip}</td>
+                <td className="mono">{redact(node.ip)}</td>
                 <td>
                   <div className="ts-conn">
                     <span className={`pill ${connectionColor(node)}`}>{CONNECTION_LABEL[node.connection]}</span>
-                    <Detail node={node} />
+                    <Detail node={node} redact={redact} />
                   </div>
                 </td>
                 <td className="hide-sm mono muted">

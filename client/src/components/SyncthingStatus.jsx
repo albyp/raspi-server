@@ -1,6 +1,7 @@
 import React from 'react';
 import { SiSyncthing } from 'react-icons/si';
 import { formatBytes, timeAgo, localUrl } from '../format';
+import { usePrefs } from '../prefs';
 
 const STATE_COLOR = {
   'up to date': 'green',
@@ -15,6 +16,7 @@ const STATE_COLOR = {
 };
 
 export default function SyncthingStatus({ data }) {
+  const { redact } = usePrefs();
   if (!data) return <section className="widget">Loading Syncthing...</section>;
 
   if (!data.reachable || !data.folder) {
@@ -48,7 +50,7 @@ export default function SyncthingStatus({ data }) {
       </div>
       {folder.errorList.length > 0 && (
         <ul className="st-errors">
-          {folder.errorList.map((e, i) => <li key={i}><span className="mono">{e.path}</span>: {e.error}</li>)}
+          {folder.errorList.map((e, i) => <li key={i}><span className="mono">{e.path}</span>: {redact(e.error)}</li>)}
         </ul>
       )}
 
@@ -69,7 +71,7 @@ export default function SyncthingStatus({ data }) {
             </div>
             <div className="st-device-meta muted">
               {d.connected
-                ? <>{d.connectionType?.replace(/-(client|server)$/, '')} · <span className="mono">{d.address}</span></>
+                ? <>{d.connectionType?.replace(/-(client|server)$/, '')} · <span className="mono">{redact(d.address)}</span></>
                 : <>last seen {timeAgo(d.lastSeen)}</>}
             </div>
             {d.completion != null && (

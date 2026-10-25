@@ -7,7 +7,7 @@
   flex-shrink: 0;
   background-color: var(--idle);
 }
-.dot.green { background-color: var(--success); box-shadow: 0 0 6px rgba(0, 212, 170, 0.5); }
+.dot.green { background-color: var(--success); box-shadow: 0 0 6px var(--glow); }
 .dot.amber { background-color: var(--warning); }
 .dot.red { background-color: var(--error); }
 .dot.grey { background-color: var(--idle); }
@@ -44,7 +44,7 @@
   color: var(--text-secondary);
   white-space: nowrap;
 }
-.tag.accent { background: var(--accent); color: #000; }
+.tag.accent { background: var(--accent); color: var(--on-accent); }
 
 .bar {
   height: 4px;
@@ -413,7 +413,7 @@
 
 .toggle-btn {
   background-color: var(--accent);
-  color: #000;
+  color: var(--on-accent);
   border: none;
   padding: 4px 10px;
   border-radius: 6px;
