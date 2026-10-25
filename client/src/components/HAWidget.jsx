@@ -29,6 +29,9 @@ export default function HAWidget({ data }) {
     <div className="widget ha-widget">
       <h2>Home Assistant</h2>
       <div className="ha-status">✓ Connected</div>
+      {data.states?.length === 0 && (
+        <div className="error-details">None of HA_ENTITY_IDS matched — set real entity IDs in .env</div>
+      )}
       <div className="entity-list">
         {data.states && data.states.map((entity, index) => (
           <div key={index} className="entity-item">

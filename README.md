@@ -1,151 +1,72 @@
 # Raspi Server - Pi Dashboard
 
-A self-hosted home server dashboard running on a Raspberry Pi 4, accessible via Tailscale. Displays real-time system stats, Docker container status, Home Assistant device states/controls, network info, and quick links to hosted services.
+A self-hosted home server dashboard running on a Raspberry Pi 4, accessible via Tailscale. Runs as a Docker container that starts with the Pi.
 
 ## Features
 
-- **System Monitoring**: CPU usage, RAM, disk space, temperature, and uptime
-- **Docker Integration**: View status of all running containers
-- **Home Assistant Control**: Monitor and control HA entities
-- **Network Info**: Tailscale and local IP addresses
-- **Quick Links**: Easy access to hosted services
-- **Dark Theme**: Industrial control panel aesthetic
-- **Real-time Updates**: Polls data every 10 seconds
+- **System Monitoring**: CPU, load, RAM, disk, temperature, uptime
+- **Docker auto-discovery**: every container shows up automatically, with a link to its web UI if it has one
+- **Host services**: native Pi services (qBittorrent, Syncthing) and remote ones on rocky (Jellyfin, qBittorrent) probed for up/down, latency and version
+- **Tailscale**: every device on the tailnet — online/offline, direct vs relay, endpoint, traffic, last seen, exit nodes
+- **Syncthing**: status of the `Albyte (Obsidian)` folder and each peer device's connection and sync completion
+- **Home Assistant**: monitor and toggle HA entities
+- **Real-time Updates**: polls every 10 seconds
 
-## Tech Stack
+## Running it (on the Pi)
 
-- **Backend**: Node.js + Express
-- **Frontend**: React + Vite
-- **System Info**: systeminformation package
-- **Docker**: dockerode package
-- **Home Assistant**: REST API integration
-- **Network**: Tailscale status + system network interfaces
-
-## Project Structure
-
-```
-raspi-server/
-├── server/                    # Express backend
-│   ├── index.js              # Main server file
-│   ├── routes/
-│   │   └── status.js         # API endpoints
-│   └── services/             # Data collection services
-│       ├── system.js
-│       ├── docker.js
-│       ├── homeassistant.js
-│       └── network.js
-├── client/                   # React frontend
-│   ├── src/
-│   │   ├── App.jsx
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   └── index.css
-│   ├── package.json
-│   └── vite.config.js
-├── .env                      # Environment variables
-├── .env.example             # Environment template
-└── docs/
-    └── DEVELOPMENT_PLAN.md  # Detailed development plan
+```bash
+cd ~/LocalGit/raspi-server
+docker compose up -d --build
 ```
 
-## Setup
+Dashboard: `http://raspi:3001`
 
-### Prerequisites
+The container uses `restart: unless-stopped`, and `docker.service` is enabled at boot, so it comes back on its own after a reboot. After pulling changes, rerun the same command to rebuild.
 
-- Node.js 18+
-- npm or yarn
-- (On Raspberry Pi) Docker installed and user in docker group
-- (On Raspberry Pi) Tailscale installed and connected
+Logs: `docker logs -f raspi-dashboard`
 
-### Installation
+## How Docker links are found
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd raspi-server
-   ```
+For each running container, in order:
 
-2. Install backend dependencies:
-   ```bash
-   cd server
-   npm install
-   ```
+1. `dashboard.url` label — `":8123"`, `"/admin"`, `":8080/ui"` or a full `http://…` URL
+2. A built-in map of known images (Home Assistant → 8123, Pi-hole → `/admin`, …) — this is what covers `network_mode: host` containers, which publish no ports
+3. Each published TCP port is probed; the first that answers with HTML or a redirect becomes the link
 
-3. Install frontend dependencies:
-   ```bash
-   cd ../client
-   npm install
-   ```
+Other labels: `dashboard.name` (display name), `dashboard.hide: "true"` (leave it off the dashboard).
 
-4. Configure environment variables:
-   ```bash
-   cp ../.env.example ../.env
-   # Edit .env with your Home Assistant token and settings
-   ```
-
-### Environment Variables
-
-```env
-# .env
-HA_BASE_URL=http://localhost:8123
-HA_TOKEN=your_long_lived_token_here
-HA_ENTITY_IDS=light.living_room,switch.fan,binary_sensor.front_door
-
-PORT=3001
+```yaml
+labels:
+  dashboard.url: ":8096/web/"
+  dashboard.name: "Jellyfin"
 ```
 
-### Development
+Links are built from the hostname you opened the dashboard with, so they work via `raspi`, the LAN IP, or the Tailscale IP.
 
-1. Start the backend server:
-   ```bash
-   cd server
-   npm start
-   ```
+## Non-docker services (`services.json`)
 
-2. Start the frontend development server:
-   ```bash
-   cd client
-   npm run dev
-   ```
+Native Pi services and services on other machines live in `services.json`. Hosts are resolved through Tailscale status first, then DNS. Edit it and `docker compose restart` — no rebuild needed.
 
-3. Open http://localhost:5173 in your browser
+`kind` adds extra details: `jellyfin` (version), `qbittorrent` (speeds/active torrents — needs `<AUTH>_USER` / `<AUTH>_PASS` in `.env` matching the service's `auth` field).
 
-### Production Deployment
+## Environment Variables
 
-1. Build the frontend:
-   ```bash
-   cd client
-   npm run build
-   ```
+See `.env.example`. The Syncthing API key is read from the mounted Syncthing `config.xml`, so it doesn't need to be copied into `.env`.
 
-2. Copy the build to server public directory:
-   ```bash
-   cp -r dist ../server/public
-   ```
+## Development
 
-3. Start the production server:
-   ```bash
-   cd server
-   npm start
-   ```
+```bash
+cd server && npm install && npm start      # API on :3001
+cd client && npm install && npm run dev    # Vite on :5173, proxies /api
+```
 
-The dashboard will be available at `http://localhost:3001`
+Outside the container the server expects `/var/run/docker.sock`, `/var/run/tailscale/tailscaled.sock` and `SYNCTHING_CONFIG` (default `/syncthing/config.xml` — point it at `~/.local/state/syncthing/config.xml`).
 
 ## API Endpoints
 
 - `GET /api/status` - Returns all dashboard data
 - `POST /api/ha/service` - Proxy for Home Assistant service calls
-
-## Deployment on Raspberry Pi
-
-See `docs/DEVELOPMENT_PLAN.md` for detailed systemd service setup and deployment instructions.
-
-## Contributing
-
-1. Follow the existing code style
-2. Add tests for new features
-3. Update documentation as needed
-4. Test on actual Raspberry Pi hardware when possible
+- `GET /api/health` - Container healthcheck
 
 ## License
 

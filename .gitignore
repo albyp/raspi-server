@@ -4,3 +4,7 @@ server/node_modules
 
 # env files
 *.env
+
+# build output
+client/dist
+server/public

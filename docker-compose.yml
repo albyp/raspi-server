@@ -1,0 +1,28 @@
+services:
+  dashboard:
+    build:
+      context: .
+      # Bridge-network builds can't resolve DNS here (host resolver is Tailscale's 100.100.100.100)
+      network: host
+    image: raspi-dashboard:latest
+    container_name: raspi-dashboard
+    # Comes back after reboots / crashes (docker.service is enabled at boot)
+    restart: unless-stopped
+    # Host networking so we see the Pi's real interfaces and can reach
+    # localhost-only services (Syncthing, HA, native qBittorrent)
+    network_mode: host
+    env_file: .env
+    environment:
+      - PORT=${PORT:-3001}
+      - SERVICES_CONFIG=/app/services.json
+      - SYNCTHING_CONFIG=/syncthing/config.xml
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Directory (not the socket file) so it survives tailscaled restarts
+      - /var/run/tailscale:/var/run/tailscale
+      # Syncthing API key is read from here; directory mount survives config rewrites
+      - /home/alby/.local/state/syncthing:/syncthing:ro
+      # Edit services.json and `docker compose restart` — no rebuild needed
+      - ./services.json:/app/services.json:ro
+    labels:
+      dashboard.hide: "true"

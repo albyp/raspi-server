@@ -1,0 +1,23 @@
+{
+  "hosts": [
+    {
+      "name": "raspi",
+      "host": "raspi",
+      "local": true,
+      "description": "Native services on the Pi (not in Docker)",
+      "services": [
+        { "name": "qBittorrent", "kind": "qbittorrent", "port": 8090, "auth": "RASPI_QBIT" },
+        { "name": "Syncthing", "kind": "syncthing", "port": 8384 }
+      ]
+    },
+    {
+      "name": "rocky",
+      "host": "rocky-1",
+      "description": "Main PC — Docker in WSL",
+      "services": [
+        { "name": "Jellyfin", "kind": "jellyfin", "port": 8096, "path": "/web/" },
+        { "name": "qBittorrent", "kind": "qbittorrent", "port": 8080, "auth": "ROCKY_QBIT" }
+      ]
+    }
+  ]
+}

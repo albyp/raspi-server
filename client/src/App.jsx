@@ -2,8 +2,9 @@ import React from 'react';
 import SystemStats from './components/SystemStats';
 import DockerStatus from './components/DockerStatus';
 import HAWidget from './components/HAWidget';
-import NetworkInfo from './components/NetworkInfo';
-import QuickLinks from './components/QuickLinks';
+import HostServices from './components/HostServices';
+import TailscaleStatus from './components/TailscaleStatus';
+import SyncthingStatus from './components/SyncthingStatus';
 import useDashboard from './hooks/useDashboard';
 import './App.css';
 
@@ -14,13 +15,22 @@ function App() {
     return <div className="loading">Loading dashboard...</div>;
   }
 
+  const tsSelf = data?.tailscale?.self;
+
   return (
     <div className={`dashboard${isStale ? ' stale' : ''}`}>
       <header className="dashboard-header">
-        <h1>Pi Dashboard</h1>
+        <div>
+          <h1>{data?.hostname || 'raspi'}</h1>
+          <div className="header-ips mono">
+            {data?.network?.localIp && <span>LAN {data.network.localIp}</span>}
+            {tsSelf?.ip && <span>TS {tsSelf.ip}</span>}
+          </div>
+        </div>
         {lastUpdated && (
           <div className={`last-updated${isStale ? ' stale' : ''}`}>
-            Last updated: {lastUpdated}{isStale ? ' — connection lost' : ''}
+            <span className={`dot ${isStale ? 'amber' : 'green'} pulse`} />
+            {lastUpdated}{isStale ? ' — connection lost' : ''}
           </div>
         )}
       </header>
@@ -28,9 +38,10 @@ function App() {
       <div className="dashboard-grid">
         <SystemStats data={data?.system} />
         <DockerStatus data={data?.docker} />
+        <HostServices data={data?.services} />
+        <SyncthingStatus data={data?.syncthing} />
+        <TailscaleStatus data={data?.tailscale} />
         <HAWidget data={data?.homeassistant} />
-        <NetworkInfo data={data?.network} />
-        <QuickLinks />
       </div>
 
       {error && (

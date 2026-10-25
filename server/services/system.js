@@ -23,6 +23,9 @@ export async function getSystemInfo() {
     // Get uptime
     const uptime = os.uptime();
 
+    // Inside the container '/' is the overlay, which sits on the Pi's root fs
+    const root = disk.find(d => d.mount === '/') || disk[0];
+
     return {
       cpu: Math.round(cpuLoad.currentLoad * 100) / 100,
       ram: {
@@ -31,11 +34,13 @@ export async function getSystemInfo() {
         percent: Math.round(mem.active / mem.total * 100)
       },
       disk: {
-        used: Math.round(disk[0].used / 1024 / 1024 / 1024 * 100) / 100, // GB
-        total: Math.round(disk[0].size / 1024 / 1024 / 1024 * 100) / 100,
-        percent: Math.round(disk[0].use)
+        used: Math.round(root.used / 1024 / 1024 / 1024 * 100) / 100, // GB
+        total: Math.round(root.size / 1024 / 1024 / 1024 * 100) / 100,
+        percent: Math.round(root.use)
       },
       temp: temp ? Math.round(temp * 10) / 10 : null,
+      load: os.loadavg().map(l => Math.round(l * 100) / 100),
+      cores: os.cpus().length,
       uptime
     };
   } catch (error) {
