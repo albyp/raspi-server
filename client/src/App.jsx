@@ -5,6 +5,7 @@ import HAWidget from './components/HAWidget';
 import HostServices from './components/HostServices';
 import TailscaleStatus from './components/TailscaleStatus';
 import SyncthingStatus from './components/SyncthingStatus';
+import HumidorStatus from './components/HumidorStatus';
 import useDashboard from './hooks/useDashboard';
 import './App.css';
 
@@ -37,6 +38,7 @@ function App() {
 
       <div className="dashboard-grid">
         <SystemStats data={data?.system} />
+        <HumidorStatus data={data?.humidor} />
         <DockerStatus data={data?.docker} />
         <HostServices data={data?.services} />
         <SyncthingStatus data={data?.syncthing} />

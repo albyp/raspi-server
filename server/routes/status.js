@@ -7,6 +7,7 @@ import { getNetworkInfo } from '../services/network.js';
 import { getTailscaleInfo } from '../services/tailscale.js';
 import { getSyncthingInfo } from '../services/syncthing.js';
 import { getServicesInfo } from '../services/services.js';
+import { getHumidorInfo } from '../services/humidor.js';
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ async function safe(name, fn) {
 router.get('/status', async (req, res) => {
   const tailscalePromise = safe('tailscale', getTailscaleInfo);
 
-  const [system, docker, homeassistant, network, tailscale, syncthing, services] = await Promise.all([
+  const [system, docker, homeassistant, network, tailscale, syncthing, services, humidor] = await Promise.all([
     safe('system', getSystemInfo),
     safe('docker', getDockerInfo),
     safe('homeassistant', getHomeAssistantInfo),
@@ -31,7 +32,8 @@ router.get('/status', async (req, res) => {
     tailscalePromise,
     safe('syncthing', getSyncthingInfo),
     // Remote services resolve hostnames via tailscale status
-    tailscalePromise.then(ts => safe('services', () => getServicesInfo(ts)))
+    tailscalePromise.then(ts => safe('services', () => getServicesInfo(ts))),
+    safe('humidor', getHumidorInfo)
   ]);
 
   res.json({
@@ -43,7 +45,8 @@ router.get('/status', async (req, res) => {
     network,
     tailscale,
     syncthing,
-    services
+    services,
+    humidor
   });
 });
 

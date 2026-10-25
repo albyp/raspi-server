@@ -9,6 +9,7 @@ A self-hosted home server dashboard running on a Raspberry Pi 4, accessible via 
 - **Host services**: native Pi services (qBittorrent, Syncthing) and remote ones on rocky (Jellyfin, qBittorrent) probed for up/down, latency and version
 - **Tailscale**: every device on the tailnet — online/offline, direct vs relay, endpoint, traffic, last seen, exit nodes
 - **Syncthing**: status of the `Albyte (Obsidian)` folder and each peer device's connection and sync completion
+- **Humidors**: Govee H5xxx sensors from Home Assistant, found automatically — humidity, temperature, battery, 24h humidity trend against the target band, and a status (in range / drying out / running wet / too warm / no recent data). Ranges are set with `HUMIDOR_*` in `.env`
 - **Home Assistant**: monitor and toggle HA entities
 - **Real-time Updates**: polls every 10 seconds
 

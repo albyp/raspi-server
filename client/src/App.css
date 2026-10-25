@@ -265,6 +265,108 @@
   padding-left: 16px;
 }
 
+/* Humidors */
+.hd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.hd-card {
+  padding: 14px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+.hd-card.warning { border-color: var(--warning); }
+.hd-card.critical { border-color: var(--error); }
+
+.hd-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.hd-name { font-weight: 600; font-size: 0.95rem; }
+.hd-head .pill { display: inline-flex; align-items: center; gap: 4px; }
+
+.hd-readings {
+  display: flex;
+  gap: 24px;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+.hd-range { margin-left: auto; text-align: right; font-size: 0.8rem; white-space: nowrap; }
+
+.hd-value {
+  font-family: var(--mono);
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.hd-value span {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+.hd-trend { position: relative; cursor: crosshair; }
+.hd-trend svg { display: block; width: 100%; height: 64px; overflow: visible; }
+.empty-trend { cursor: default; font-size: 0.78rem; padding: 20px 0; text-align: center; }
+
+.hd-band { fill: var(--accent); opacity: 0.08; }
+.hd-band-edge {
+  stroke: var(--accent);
+  stroke-opacity: 0.35;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+.hd-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.hd-cross {
+  stroke: var(--text-muted);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.hd-marker {
+  fill: var(--accent);
+  stroke: var(--bg-tertiary);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.hd-tooltip {
+  position: absolute;
+  top: -6px;
+  transform: translate(-50%, -100%);
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.hd-axis, .hd-foot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  margin-top: 4px;
+}
+.hd-foot { margin-top: 10px; font-size: 0.76rem; }
+.hd-foot span { display: inline-flex; align-items: center; gap: 4px; }
+
 /* Home Assistant */
 .ha-error {
   color: var(--error);
