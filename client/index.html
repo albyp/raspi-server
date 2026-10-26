@@ -9,8 +9,10 @@
       // Set the theme before first paint so light mode doesn't flash dark
       try {
         var t = JSON.parse(localStorage.getItem('dash.theme'));
-        document.documentElement.dataset.theme = t ||
-          (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        if (['dark', 'light', 'pi', 'terminal'].indexOf(t) < 0) {
+          t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.dataset.theme = t;
       } catch (e) {}
     </script>
   </head>

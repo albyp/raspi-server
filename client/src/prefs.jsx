@@ -17,8 +17,21 @@ function save(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode etc. */ }
 }
 
+// Keep ids in sync with the :root[data-theme] blocks in index.css and the boot script in index.html
+export const THEMES = [
+  { id: 'dark', name: 'Dark', swatch: ['#111315', '#00d4aa', '#e8eaed'] },
+  { id: 'light', name: 'Light', swatch: ['#f3f4f6', '#00826a', '#1a1d21'] },
+  { id: 'pi', name: 'Pi', swatch: ['#f4ecdf', '#c51a4a', '#3a7d34'] },
+  { id: 'terminal', name: 'Terminal', swatch: ['#1e1e2e', '#cba6f7', '#89b4fa'] },
+];
+
 function systemTheme() {
   return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+function initialTheme() {
+  const stored = load('dash.theme', null);
+  return THEMES.some(t => t.id === stored) ? stored : systemTheme();
 }
 
 const IPV4 = /\b(?:\d{1,3}\.){3}\d{1,3}\b/g;
@@ -36,7 +49,7 @@ export function redactText(text) {
 }
 
 export function PrefsProvider({ children }) {
-  const [theme, setTheme] = useState(() => load('dash.theme', null) || systemTheme());
+  const [theme, setTheme] = useState(initialTheme);
   const [redacted, setRedacted] = useState(() => load('dash.redacted', false));
 
   useEffect(() => {
@@ -46,12 +59,11 @@ export function PrefsProvider({ children }) {
 
   useEffect(() => { save('dash.redacted', redacted); }, [redacted]);
 
-  const toggleTheme = useCallback(() => setTheme(t => (t === 'light' ? 'dark' : 'light')), []);
   const toggleRedact = useCallback(() => setRedacted(r => !r), []);
   const redact = useCallback(text => (redacted ? redactText(text) : text), [redacted]);
 
   return (
-    <PrefsContext.Provider value={{ theme, toggleTheme, redacted, toggleRedact, redact }}>
+    <PrefsContext.Provider value={{ theme, setTheme, redacted, toggleRedact, redact }}>
       {children}
     </PrefsContext.Provider>
   );

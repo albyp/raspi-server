@@ -16,8 +16,12 @@
   --border: #2e3338;
   --on-accent: #000000;
   --glow: rgba(0, 212, 170, 0.5);
+  /* Data marks (bars, trend lines) — separate from accent so a red-accent theme doesn't paint normal readings as alarms */
+  --data: var(--accent);
   color-scheme: dark;
   --radius: 10px;
+  --radius-sm: 8px;
+  --radius-pill: 999px;
   --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
@@ -46,6 +50,107 @@
 :root[data-theme="light"] .widget {
   box-shadow: 0 1px 2px rgba(16, 24, 32, 0.05);
 }
+
+/* Pi theme — creme paper, raspberry red accent, leaf green for healthy/data */
+:root[data-theme="pi"] {
+  --bg-primary: #f4ecdf;
+  --bg-secondary: #fffaf2;
+  --bg-tertiary: #f3e9d9;
+  --bg-hover: #ecdfca;
+  --text-primary: #2e1f19;
+  --text-secondary: #5a4237;
+  --text-muted: #7c6558;
+  --accent: #c51a4a;
+  --accent-hover: #a3143c;
+  --success: #3a7d34;
+  --warning: #b25e00;
+  --error: #b3261e;
+  --idle: #b6a796;
+  --border: #e4d6c1;
+  --on-accent: #ffffff;
+  --glow: rgba(58, 125, 52, 0.35);
+  --data: #3a7d34;
+  color-scheme: light;
+  --radius: 14px;
+  --radius-sm: 10px;
+}
+
+:root[data-theme="pi"] .widget {
+  box-shadow: 0 1px 0 rgba(197, 26, 74, 0.06), 0 2px 6px rgba(46, 31, 25, 0.05);
+}
+:root[data-theme="pi"] .widget h2 { color: var(--accent); }
+
+/* Terminal theme — riced desktop (r/unixporn) look: Catppuccin Mocha palette,
+   tiling-WM panels with gaps and an accent border on hover, waybar-style header */
+:root[data-theme="terminal"] {
+  --bg-primary: #11111b;   /* crust — the "wallpaper" between windows */
+  --bg-secondary: #1e1e2e; /* base */
+  --bg-tertiary: #313244;  /* surface0 */
+  --bg-hover: #45475a;     /* surface1 */
+  --text-primary: #cdd6f4;
+  --text-secondary: #bac2de;
+  --text-muted: #7f849c;
+  --accent: #cba6f7;       /* mauve */
+  --accent-hover: #b4befe;
+  --success: #a6e3a1;
+  --warning: #fab387;
+  --error: #f38ba8;
+  --idle: #585b70;
+  --border: #313244;
+  --on-accent: #11111b;
+  --glow: rgba(166, 227, 161, 0.45);
+  --data: #89b4fa;         /* blue */
+  color-scheme: dark;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --sans: var(--mono);
+}
+
+:root[data-theme="terminal"] .dashboard { max-width: 1500px; }
+:root[data-theme="terminal"] .dashboard-grid { gap: 10px; }
+
+/* Bar-style header */
+:root[data-theme="terminal"] .dashboard-header {
+  align-items: center;
+  padding: 8px 10px 8px 16px;
+  margin-bottom: 10px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+}
+:root[data-theme="terminal"] .dashboard-header h1 { font-size: 1.2rem; }
+:root[data-theme="terminal"] .dashboard-header h1::before {
+  content: '\25C6\00a0';
+  color: var(--data);
+}
+:root[data-theme="terminal"] .header-ips span {
+  padding: 1px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+:root[data-theme="terminal"] .icon-btn { background: var(--bg-tertiary); border-color: transparent; }
+
+/* Windows: thicker border, focus colour on hover like an active tiling window */
+:root[data-theme="terminal"] .widget {
+  border-width: 2px;
+  transition: border-color 0.15s ease;
+}
+:root[data-theme="terminal"] .widget:hover { border-color: var(--accent); }
+
+/* Lowercase, colour-coded window titles */
+:root[data-theme="terminal"] .widget h2 {
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  font-size: 0.85rem;
+}
+:root[data-theme="terminal"] .widget h2::before { content: '\25CF\00a0'; }
+:root[data-theme="terminal"] .humidor h2 { color: #f5c2e7; }       /* pink */
+:root[data-theme="terminal"] .docker-status h2 { color: #89b4fa; } /* blue */
+:root[data-theme="terminal"] .host-services h2 { color: #74c7ec; } /* sapphire */
+:root[data-theme="terminal"] .syncthing h2 { color: #b4befe; }     /* lavender */
+:root[data-theme="terminal"] .tailscale h2 { color: #cba6f7; }     /* mauve */
+:root[data-theme="terminal"] .ha-widget h2 { color: #f5e0dc; }     /* rosewater */
 
 * {
   box-sizing: border-box;
@@ -120,7 +225,7 @@ a { color: inherit; }
   color: var(--text-secondary);
   background: var(--bg-secondary);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
 }
 .icon-btn:hover { color: var(--text-primary); border-color: var(--accent); }
@@ -130,6 +235,51 @@ a { color: inherit; }
   border-color: var(--accent);
 }
 .icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.theme-picker { position: relative; }
+
+.theme-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 50;
+  min-width: 170px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+}
+.theme-option:hover, .theme-option:focus-visible { background: var(--bg-hover); outline: none; }
+.theme-option[aria-pressed="true"] { font-weight: 600; }
+.theme-name { flex: 1; }
+.theme-check { color: var(--accent); }
+
+.swatch {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+.swatch span { width: 10px; height: 16px; }
 
 .last-updated {
   display: flex;
@@ -159,8 +309,6 @@ a { color: inherit; }
 .widget h2 {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -170,6 +318,8 @@ a { color: inherit; }
 }
 
 .h2-meta {
+  margin-left: auto;
+  padding-left: 12px;
   font-size: 0.78rem;
   font-weight: 400;
   text-transform: none;

@@ -8,12 +8,13 @@ import SyncthingStatus from './components/SyncthingStatus';
 import HumidorStatus from './components/HumidorStatus';
 import useDashboard from './hooks/useDashboard';
 import { usePrefs } from './prefs';
-import { FiSun, FiMoon, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
+import ThemePicker from './components/ThemePicker';
 import './App.css';
 
 function App() {
   const { data, loading, error, lastUpdated, isStale } = useDashboard();
-  const { theme, toggleTheme, redacted, toggleRedact, redact } = usePrefs();
+  const { redacted, toggleRedact, redact } = usePrefs();
 
   if (loading && !data) {
     return <div className="loading">Loading dashboard...</div>;
@@ -48,14 +49,7 @@ function App() {
               {redacted ? <FiEyeOff aria-hidden="true" /> : <FiEye aria-hidden="true" />}
               <span className="btn-label">{redacted ? 'Redacted' : 'Redact'}</span>
             </button>
-            <button
-              className="icon-btn"
-              onClick={toggleTheme}
-              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-              aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-            >
-              {theme === 'light' ? <FiMoon aria-hidden="true" /> : <FiSun aria-hidden="true" />}
-            </button>
+            <ThemePicker />
           </div>
         </div>
       </header>
