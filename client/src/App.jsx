@@ -6,6 +6,7 @@ import HostServices from './components/HostServices';
 import TailscaleStatus from './components/TailscaleStatus';
 import SyncthingStatus from './components/SyncthingStatus';
 import HumidorStatus from './components/HumidorStatus';
+import BetbotStatus from './components/BetbotStatus';
 import useDashboard from './hooks/useDashboard';
 import { usePrefs } from './prefs';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
@@ -57,6 +58,7 @@ function App() {
       <div className="dashboard-grid">
         <SystemStats data={data?.system} />
         <HumidorStatus data={data?.humidor} />
+        <BetbotStatus data={data?.betbot} />
         <DockerStatus data={data?.docker} />
         <HostServices data={data?.services} />
         <SyncthingStatus data={data?.syncthing} />

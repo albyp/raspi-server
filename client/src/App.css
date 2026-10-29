@@ -84,6 +84,7 @@
   font-weight: 700;
   line-height: 1.3;
 }
+.stat-value.green { color: var(--success); }
 .stat-value.amber { color: var(--warning); }
 .stat-value.red { color: var(--error); }
 
@@ -426,3 +427,10 @@
 .toggle-btn:hover {
   background-color: var(--accent-hover);
 }
+
+/* Betbot */
+.betbot h2 .pill { margin-left: auto; }
+.betbot .stat-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.betbot .bb-recorder { margin-top: 14px; }
+.betbot .bb-recorder .muted { margin-left: 0; font-size: 0.78rem; }
+.betbot .widget-error { margin-top: 8px; }

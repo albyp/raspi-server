@@ -10,6 +10,7 @@ A self-hosted home server dashboard running on a Raspberry Pi 4, accessible via 
 - **Tailscale**: every device on the tailnet — online/offline, direct vs relay, endpoint, traffic, last seen, exit nodes
 - **Syncthing**: status of the `Albyte (Obsidian)` folder and each peer device's connection and sync completion
 - **Humidors**: Govee H5xxx sensors from Home Assistant, found automatically — humidity, temperature, battery, 24h humidity trend against the target band, and a status (in range / drying out / running wet / too warm / no recent data). Ranges are set with `HUMIDOR_*` in `.env`
+- **Betbot**: armed state, bank, today's and since-arm P&L, open liability and recorder health from ~/betbot (its containers publish their page on the Pi's loopback only; it's proxied read-only at `/betbot/`). Arming stays a CLI command on the Pi
 - **Home Assistant**: monitor and toggle HA entities
 - **Real-time Updates**: polls every 10 seconds
 
