@@ -27,6 +27,7 @@ Dashboard: `https://raspi.tail6accbd.ts.net` (tailnet only, password login)
 
 - The server listens on `127.0.0.1:3001` only. It is not reachable from the LAN.
 - `tailscale serve` publishes it over HTTPS to the tailnet. This was set up once with `sudo tailscale serve --bg --https=443 http://127.0.0.1:3001` and persists across reboots. Check it with `tailscale serve status`.
+- Old links such as `http://raspi:3001/betbot/` still work over the tailnet. `sudo tailscale serve --bg --http=3001 http://127.0.0.1:3002` sends them to a small redirect listener (`REDIRECT_PORT`), which returns a 301 to the same path on `PUBLIC_URL`. After login you land on the page you asked for.
 - Every page and API route except `/api/health` needs a login. Set or change the password with `./set-password.sh` (12+ characters). It writes `DASHBOARD_PASSWORD_HASH` and `SESSION_SECRET` into `.env`, which must stay `chmod 600`. Sessions last 30 days. Delete `SESSION_SECRET` and re-run the script to log out every browser.
 - Docker is read through `socket-proxy` (only listing containers is allowed). The dashboard never gets the raw Docker socket.
 - The dashboard container runs as uid 1000 with a read-only filesystem and no capabilities. As non-root, the Tailscale LocalAPI only lets it read status.

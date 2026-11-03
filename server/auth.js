@@ -66,7 +66,13 @@ function setSessionCookie(res, value, maxAgeSeconds) {
   res.set('Set-Cookie', `${COOKIE}=${value}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAgeSeconds}`);
 }
 
-function loginPage(message = '') {
+// Where to go after logging in: same-site paths only ('/x', never '//host' or '/\host')
+function safeNext(value) {
+  return typeof value === 'string' && /^\/(?![/\\])/.test(value) ? value : '/';
+}
+
+function loginPage(message = '', next = '/') {
+  const action = next === '/' ? '/login' : `/login?next=${encodeURIComponent(next)}`;
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashboard login</title>
@@ -80,7 +86,7 @@ function loginPage(message = '') {
   button { background: #00a884; color: #fff; border: 0; cursor: pointer; }
   .msg { color: #e5534b; font-size: .9rem; min-height: 1.2em; }
 </style></head>
-<body><form method="post" action="/login">
+<body><form method="post" action="${action.replace(/"/g, '&quot;')}">
   <h1>Dashboard</h1>
   <input type="password" name="password" placeholder="Password" autocomplete="current-password" autofocus required>
   <button type="submit">Log in</button>
@@ -93,22 +99,24 @@ export function authRouter() {
   router.use(express.urlencoded({ extended: false, limit: '2kb' }));
 
   router.get('/login', (req, res) => {
-    if (validToken(readCookie(req, COOKIE))) return res.redirect(302, '/');
-    res.type('html').send(loginPage(configured() ? '' : 'Login is not set up. Run ./set-password.sh on the host.'));
+    const next = safeNext(req.query.next);
+    if (validToken(readCookie(req, COOKIE))) return res.redirect(302, next);
+    res.type('html').send(loginPage(configured() ? '' : 'Login is not set up. Run ./set-password.sh on the host.', next));
   });
 
   router.post('/login', async (req, res) => {
-    if (!configured()) return res.status(503).type('html').send(loginPage('Login is not set up. Run ./set-password.sh on the host.'));
+    const next = safeNext(req.query.next);
+    if (!configured()) return res.status(503).type('html').send(loginPage('Login is not set up. Run ./set-password.sh on the host.', next));
 
     // Global lockout: behind `tailscale serve` every request comes from 127.0.0.1
     if (failures.count >= MAX_FAILURES && Date.now() - failures.since < LOCKOUT_MS) {
-      return res.status(429).type('html').send(loginPage('Too many attempts. Try again in 15 minutes.'));
+      return res.status(429).type('html').send(loginPage('Too many attempts. Try again in 15 minutes.', next));
     }
 
     if (await checkPassword(req.body?.password ?? '')) {
       failures.count = 0;
       setSessionCookie(res, makeToken(), SESSION_DAYS * 24 * 60 * 60);
-      return res.redirect(303, '/');
+      return res.redirect(303, next);
     }
 
     if (Date.now() - failures.since >= LOCKOUT_MS) {
@@ -117,7 +125,7 @@ export function authRouter() {
     }
     failures.count += 1;
     console.warn(`Failed dashboard login (${failures.count}/${MAX_FAILURES})`);
-    res.status(401).type('html').send(loginPage('Wrong password.'));
+    res.status(401).type('html').send(loginPage('Wrong password.', next));
   });
 
   router.post('/logout', (req, res) => {
@@ -135,5 +143,5 @@ export function requireLogin(req, res, next) {
   if (req.path.startsWith('/api/') || req.path.startsWith('/betbot/api/')) {
     return res.status(401).json({ error: 'login required' });
   }
-  res.redirect(302, '/login');
+  res.redirect(302, req.originalUrl === '/' ? '/login' : `/login?next=${encodeURIComponent(req.originalUrl)}`);
 }

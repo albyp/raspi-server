@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -58,3 +59,15 @@ app.get('*', (req, res, next) => {
 app.listen(PORT, HOST, () => {
   console.log(`Pi Dashboard server running on ${HOST}:${PORT}`);
 });
+
+// Old links (http://raspi:3001/betbot/ etc.) reach this through `tailscale serve --http=3001`
+// and get sent to the HTTPS address. The host is fixed, so it can't redirect anywhere else.
+const { PUBLIC_URL, REDIRECT_PORT } = process.env;
+if (PUBLIC_URL && REDIRECT_PORT) {
+  http.createServer((req, res) => {
+    res.writeHead(301, { Location: `${PUBLIC_URL.replace(/\/$/, '')}${req.url}` });
+    res.end();
+  }).listen(REDIRECT_PORT, HOST, () => {
+    console.log(`Redirecting ${HOST}:${REDIRECT_PORT} to ${PUBLIC_URL}`);
+  });
+}

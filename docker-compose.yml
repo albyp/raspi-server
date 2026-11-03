@@ -42,6 +42,9 @@ services:
     environment:
       - PORT=${PORT:-3001}
       - HOST=127.0.0.1
+      # Old http://raspi:3001/... links: `tailscale serve --http=3001` -> 3002 -> 301 to PUBLIC_URL
+      - PUBLIC_URL=https://raspi.tail6accbd.ts.net
+      - REDIRECT_PORT=3002
       - DOCKER_HOST=tcp://127.0.0.1:2375
       - SERVICES_CONFIG=/app/services.json
       - SYNCTHING_CONFIG=/syncthing/config.xml
