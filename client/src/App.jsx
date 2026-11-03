@@ -9,7 +9,7 @@ import HumidorStatus from './components/HumidorStatus';
 import BetbotStatus from './components/BetbotStatus';
 import useDashboard from './hooks/useDashboard';
 import { usePrefs } from './prefs';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiLogOut } from 'react-icons/fi';
 import ThemePicker from './components/ThemePicker';
 import './App.css';
 
@@ -51,6 +51,12 @@ function App() {
               <span className="btn-label">{redacted ? 'Redacted' : 'Redact'}</span>
             </button>
             <ThemePicker />
+            <form method="post" action="/logout" style={{ display: 'contents' }}>
+              <button type="submit" className="icon-btn" title="Log out">
+                <FiLogOut aria-hidden="true" />
+                <span className="btn-label">Log out</span>
+              </button>
+            </form>
           </div>
         </div>
       </header>

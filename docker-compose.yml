@@ -1,4 +1,27 @@
 services:
+  # Read-only view of the Docker API. Only container listing is allowed; every
+  # write (POST/DELETE) is refused. Mounting docker.sock straight into the
+  # dashboard would hand it root on the host, even with :ro.
+  socket-proxy:
+    image: lscr.io/linuxserver/socket-proxy:latest
+    container_name: raspi-dashboard-socket-proxy
+    restart: unless-stopped
+    environment:
+      - CONTAINERS=1
+      - PING=1
+      - VERSION=1
+      - POST=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      # Loopback only, for the host-networked dashboard
+      - 127.0.0.1:2375:2375
+    read_only: true
+    tmpfs:
+      - /run
+    labels:
+      dashboard.hide: "true"
+
   dashboard:
     build:
       context: .
@@ -8,18 +31,33 @@ services:
     container_name: raspi-dashboard
     # Comes back after reboots / crashes (docker.service is enabled at boot)
     restart: unless-stopped
+    depends_on:
+      - socket-proxy
     # Host networking so we see the Pi's real interfaces and can reach
-    # localhost-only services (Syncthing, HA, native qBittorrent)
+    # localhost-only services (Syncthing, HA, native qBittorrent).
+    # The server itself listens on 127.0.0.1 only; `tailscale serve` publishes
+    # it as https://raspi.tail6accbd.ts.net (tailnet only).
     network_mode: host
     env_file: .env
     environment:
       - PORT=${PORT:-3001}
+      - HOST=127.0.0.1
+      - DOCKER_HOST=tcp://127.0.0.1:2375
       - SERVICES_CONFIG=/app/services.json
       - SYNCTHING_CONFIG=/syncthing/config.xml
+    # Non-root (node = uid 1000 = alby, so it can read the Syncthing config).
+    # As non-root, tailscaled's LocalAPI only allows reading status.
+    user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       # Directory (not the socket file) so it survives tailscaled restarts
-      - /var/run/tailscale:/var/run/tailscale
+      - /var/run/tailscale:/var/run/tailscale:ro
       # Syncthing API key is read from here; directory mount survives config rewrites
       - /home/alby/.local/state/syncthing:/syncthing:ro
       # Edit services.json and `docker compose restart` — no rebuild needed

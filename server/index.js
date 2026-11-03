@@ -4,15 +4,29 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import statusRoute from './routes/status.js';
 import { betbotFetch } from './services/betbot.js';
+import { authRouter, requireLogin } from './auth.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+// Loopback only: remote access goes through `tailscale serve` (HTTPS, tailnet only)
+const HOST = process.env.HOST || '127.0.0.1';
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
-app.use(express.json());
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.set({
+    'X-Frame-Options': 'DENY',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'no-referrer'
+  });
+  next();
+});
+
+app.use(authRouter());
+app.use(requireLogin);
 
 // API routes
 app.use('/api', statusRoute);
@@ -41,6 +55,6 @@ app.get('*', (req, res, next) => {
   res.sendFile(path.join(PUBLIC_DIR, 'index.html'), err => err && next());
 });
 
-app.listen(PORT, () => {
-  console.log(`Pi Dashboard server running on port ${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`Pi Dashboard server running on ${HOST}:${PORT}`);
 });

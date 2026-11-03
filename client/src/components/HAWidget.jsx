@@ -1,17 +1,6 @@
 import React from 'react';
 
-async function toggleEntity(entity) {
-  const domain = entity.entity_id.split('.')[0];
-  const service = entity.state === 'on' ? 'turn_off' : 'turn_on';
-  await fetch('/api/ha/service', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ domain, service, entity_id: entity.entity_id })
-  });
-}
-
-const TOGGLEABLE = ['light', 'switch'];
-
+// Read-only: the dashboard never calls HA services. Control devices in HA itself.
 export default function HAWidget({ data }) {
   if (!data) return <div className="widget">Loading Home Assistant...</div>;
 
@@ -37,11 +26,6 @@ export default function HAWidget({ data }) {
           <div key={index} className="entity-item">
             <span className="entity-name">{entity.attributes?.friendly_name || entity.entity_id}</span>
             <span className="entity-state">{entity.state}</span>
-            {TOGGLEABLE.includes(entity.entity_id.split('.')[0]) && (
-              <button className="toggle-btn" onClick={() => toggleEntity(entity)}>
-                Toggle
-              </button>
-            )}
           </div>
         ))}
       </div>

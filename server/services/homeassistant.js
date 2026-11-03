@@ -37,22 +37,3 @@ export async function getHomeAssistantInfo() {
     return { reachable: false, error: error.message };
   }
 }
-
-export async function callHAService(domain, service, entity_id) {
-  const HA_BASE_URL = process.env.HA_BASE_URL || 'http://localhost:8123';
-  const HA_TOKEN = process.env.HA_TOKEN;
-  if (!HA_TOKEN) throw new Error('No HA token configured');
-
-  const response = await fetch(`${HA_BASE_URL}/api/services/${domain}/${service}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${HA_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ entity_id })
-  });
-
-  if (!response.ok) {
-    throw new Error(`HA API returned ${response.status}`);
-  }
-}

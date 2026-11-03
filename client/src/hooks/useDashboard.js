@@ -21,6 +21,11 @@ export default function useDashboard() {
     const fetchData = async () => {
       try {
         const response = await fetch('/api/status');
+        // Session expired or logged out in another tab
+        if (response.status === 401) {
+          window.location.assign('/login');
+          return;
+        }
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const newData = await response.json();
         setData(newData);

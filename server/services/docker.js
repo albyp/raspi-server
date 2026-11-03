@@ -1,7 +1,9 @@
 import Docker from 'dockerode';
 import { probeHttp } from './probe.js';
 
-const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+// DOCKER_HOST points at the read-only socket proxy (see docker-compose.yml);
+// the raw socket is only a fallback for running outside compose
+const docker = process.env.DOCKER_HOST ? new Docker() : new Docker({ socketPath: '/var/run/docker.sock' });
 
 // Containers that don't publish ports (host networking) or whose UI lives on a sub-path.
 // Override any of these per-container with labels:
