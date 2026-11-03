@@ -20,4 +20,5 @@ echo "DASHBOARD_PASSWORD_HASH=$hash" >> .env
 grep -q '^SESSION_SECRET=' .env || echo "SESSION_SECRET=$(openssl rand -hex 32)" >> .env
 
 docker compose up -d
-echo 'Password set. Log in at https://raspi.tail6accbd.ts.net/'
+url=$(sed -n 's/^PUBLIC_URL=//p' .env | tail -1)
+echo "Password set. Log in at ${url:-the dashboard's tailscale serve address}"

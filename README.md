@@ -21,7 +21,7 @@ cd ~/LocalGit/raspi-server
 docker compose up -d --build
 ```
 
-Dashboard: `https://raspi.tail6accbd.ts.net` (tailnet only, password login)
+Dashboard: `https://raspi.<tailnet>.ts.net` (tailnet only, password login)
 
 ## Access and security
 
@@ -52,7 +52,7 @@ labels:
   dashboard.name: "Jellyfin"
 ```
 
-Links are built from the hostname you opened the dashboard with (`raspi.tail6accbd.ts.net`), so they resolve over Tailscale.
+Links are built from the hostname you opened the dashboard with (`raspi.<tailnet>.ts.net`), so they resolve over Tailscale.
 
 ## Non-docker services (`services.json`)
 

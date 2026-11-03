@@ -67,9 +67,9 @@ Returns all dashboard data in a single payload. Frontend polls this every 10 sec
     { "name": "homeassistant", "status": "running", "state": "healthy" }
   ],
   "network": {
-    "tailscaleIp": "100.119.139.126",
+    "tailscaleIp": "100.x.y.z",
     "tailscaleStatus": "connected",
-    "localIp": "192.168.1.100"
+    "localIp": "192.168.x.y"
   },
   "homeassistant": {
     "reachable": true,
@@ -220,7 +220,7 @@ sudo systemctl enable pi-dashboard
 sudo systemctl start pi-dashboard
 ```
 
-Dashboard available at `http://100.119.139.126:3001`.
+Dashboard available at `http://<tailscale-ip>:3001`.
 
 ## Dependencies
 
